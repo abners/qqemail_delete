@@ -27,30 +27,23 @@ public class MailDelete {
                                                                                               throws UnsupportedEncodingException {
         MessageSendService messageSendService = new EmailSendServicImpl();
         int j = 0;
-        while (j++ < 10) {
-            try {
-                StoryFactory factory = new IMAPStoryFactory();
-                Store store = factory.getInstance();
+        try {
+            StoryFactory factory = new IMAPStoryFactory();
+            Store store = factory.getInstance();
 
-                IMAPFolder emailFolder = queryEmailFolder(user, password, folderName, messageSendService, store);
-                Integer count = emailFolder.getMessageCount();
-                int totalDeleted = deletEmailFromServer(keyword, emailFolder, count);
-                // expunges the folder to remove messages which are marked deleted
-                emailFolder.close(true);
-                store.close();
-                StringBuilder sb = new StringBuilder();
-                sb.append("共成功删除邮件" + totalDeleted + "封");
-                messageSendService.send(sb.toString(), user, password, "邮件删除完毕");
-            } catch (NoSuchProviderException e) {
-                e.printStackTrace();
-            } catch (MessagingException e) {
-                messageSendService.send(e.toString(), user, password, "删除邮件出错");
-            }
-            try {
-                Thread.sleep(10000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            IMAPFolder emailFolder = queryEmailFolder(user, password, folderName, messageSendService, store);
+            Integer count = emailFolder.getMessageCount();
+            int totalDeleted = deletEmailFromServer(keyword, emailFolder, count);
+            // expunges the folder to remove messages which are marked deleted
+            emailFolder.close(true);
+            store.close();
+            StringBuilder sb = new StringBuilder();
+            sb.append("共成功删除邮件" + totalDeleted + "封");
+            messageSendService.send(sb.toString(), user, password, "邮件删除完毕");
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            messageSendService.send(e.toString(), user, password, "删除邮件出错");
         }
     }
 
@@ -100,7 +93,7 @@ public class MailDelete {
 
                             }
                             Message message = finalMessages[i];
-                            System.out.println(Thread.currentThread().getName()+"---------------------------------");
+                            System.out.println(Thread.currentThread().getName() + "---------------------------------");
 
                             Date receivedDate = null;
                             try {
@@ -113,12 +106,13 @@ public class MailDelete {
                                 && message.getFrom()[0].toString().contains(keyword)) {
                                 x++;
 
-                                System.out.println(Thread.currentThread().getName()+"Subject: " + message.getSubject());
+                                System.out.println(Thread.currentThread().getName() + "Subject: "
+                                                   + message.getSubject());
                                 message.setFlag(Flags.Flag.DELETED, true);
                             }
 
                         }
-                        System.out.println(Thread.currentThread().getName()+":共删除"+x+"封邮件");
+                        System.out.println(Thread.currentThread().getName() + ":共删除" + x + "封邮件");
                         emailFolder.close(true);
                     } catch (MessagingException e) {
                         e.printStackTrace();
